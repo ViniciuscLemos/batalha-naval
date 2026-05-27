@@ -1,0 +1,15 @@
+# Compilados
+out/
+*.class
+
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# macOS
+.DS_Store
