@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * Gerencia o posicionamento e o estado de uma frota sobre um {@link Board}.
  *
- * <p>A {@code Fleet} é responsável por:</p>
+ * A {@code Fleet} é responsável por:
  * <ul>
  *   <li>Validar e realizar o posicionamento de navios (manual ou aleatório).</li>
  *   <li>Receber tiros e retornar o resultado via {@link ShotResult}.</li>
@@ -27,10 +27,6 @@ public class Fleet {
             for (int c = 0; c < Board.SIZE; c++)
                 shipIndex[r][c] = -1;
     }
-
-    // ------------------------------------------------------------------
-    //  Posicionamento
-    // ------------------------------------------------------------------
 
     /**
      * Verifica se o navio cabe na posição sem sair da grade ou colidir.
@@ -80,10 +76,6 @@ public class Fleet {
         }
     }
 
-    // ------------------------------------------------------------------
-    //  Combate
-    // ------------------------------------------------------------------
-
     /**
      * Aplica um tiro na célula (row, col).
      *
@@ -110,10 +102,6 @@ public class Fleet {
         board.set(row, col, Board.Cell.MISS);
         return ShotResult.MISS;
     }
-
-    // ------------------------------------------------------------------
-    //  Consultas
-    // ------------------------------------------------------------------
 
     /** Retorna {@code true} se todos os navios da frota foram afundados. */
     public boolean allSunk() {

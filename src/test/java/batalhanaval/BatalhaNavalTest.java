@@ -3,13 +3,7 @@ package batalhanaval;
 import batalhanaval.engine.CoordParser;
 import batalhanaval.model.*;
 
-/**
- * Testes unitários simples (sem framework externo).
- *
- * Execute com:
- *   javac -d out $(find src -name "*.java")
- *   java -cp out batalhanaval.BatalhaNavalTest
- */
+// testes sem framework: compila a pasta src e roda essa classe
 public class BatalhaNavalTest {
 
     private static int passed = 0;
@@ -34,10 +28,6 @@ public class BatalhaNavalTest {
         if (failed > 0) System.exit(1);
     }
 
-    // ------------------------------------------------------------------
-    //  CoordParser
-    // ------------------------------------------------------------------
-
     static void testCoordParserValid() {
         assertArrayEquals("parse A1",  new int[]{0, 0},  CoordParser.parse("A1"));
         assertArrayEquals("parse J10", new int[]{9, 9},  CoordParser.parse("J10"));
@@ -59,10 +49,6 @@ public class BatalhaNavalTest {
         assertEquals("format 9,9", "J10", CoordParser.format(9, 9));
     }
 
-    // ------------------------------------------------------------------
-    //  Ship
-    // ------------------------------------------------------------------
-
     static void testShipHit() {
         Ship s = new Ship("Test", 3);
         s.hit();
@@ -79,20 +65,12 @@ public class BatalhaNavalTest {
         assertEquals("hp >= 0 after extra hit", 0, s.getHp());
     }
 
-    // ------------------------------------------------------------------
-    //  Board
-    // ------------------------------------------------------------------
-
     static void testBoardSetGet() {
         Board b = new Board();
         assertEquals("initial cell is EMPTY", Board.Cell.EMPTY, b.get(0, 0));
         b.set(0, 0, Board.Cell.SHIP);
         assertEquals("cell is SHIP after set", Board.Cell.SHIP, b.get(0, 0));
     }
-
-    // ------------------------------------------------------------------
-    //  Fleet
-    // ------------------------------------------------------------------
 
     static void testFleetCanPlace() {
         Board b = new Board();
@@ -138,7 +116,6 @@ public class BatalhaNavalTest {
         assertEquals("second hit = SUNK", ShotResult.SUNK, f.receiveShot(0, 1));
         assertEquals("sunk ship name", "Destroyer", f.shipNameAt(0, 1));
         assertEquals("other ship SUNK", ShotResult.SUNK, f.receiveShot(5, 5));
-        // Antes, o nome ficava guardado na constante SUNK e era sobrescrito
         assertEquals("first name preserved", "Destroyer", f.shipNameAt(0, 0));
         assertEquals("second name", "Submarino", f.shipNameAt(5, 5));
         assertNull("no ship at empty cell", f.shipNameAt(9, 9));
@@ -153,7 +130,6 @@ public class BatalhaNavalTest {
         boolean threw = false;
         try { f.receiveShot(0, 0); } catch (IllegalStateException e) { threw = true; }
         assertTrue("repeated shot throws", threw);
-        // Antes, o segundo tiro transformava o acerto em água
         assertEquals("cell stays HIT", Board.Cell.HIT, b.get(0, 0));
     }
 
@@ -175,7 +151,7 @@ public class BatalhaNavalTest {
     }
 
     static void testCpuNeverRepeatsAndWins() {
-        // Simula partidas inteiras: a CPU deve afundar tudo sem repetir células
+        // joga partidas inteiras: a CPU tem que afundar tudo sem repetir casa
         for (long seed = 0; seed < 30; seed++) {
             java.util.Random rng = new java.util.Random(seed);
             Fleet f = new Fleet(new Board(), classicShips());
@@ -208,10 +184,6 @@ public class BatalhaNavalTest {
             new Ship("Cruzador", 3), new Ship("Submarino", 3), new Ship("Destroyer", 2)
         };
     }
-
-    // ------------------------------------------------------------------
-    //  Assertions
-    // ------------------------------------------------------------------
 
     static void assertEquals(String label, Object expected, Object actual) {
         if (expected.equals(actual)) {

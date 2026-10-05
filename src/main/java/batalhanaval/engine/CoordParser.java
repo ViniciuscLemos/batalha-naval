@@ -7,11 +7,11 @@ import java.util.Locale;
 /**
  * Converte entre notação do usuário ("A1"–"J10") e índices internos [row, col].
  *
- * <p>A convenção adotada é: letras A–J representam <em>colunas</em> (eixo x),
+ * A convenção adotada é: letras A–J representam <em>colunas</em> (eixo x),
  * números 1–10 representam <em>linhas</em> (eixo y). Internamente, row e col
- * são índices 0-based.</p>
+ * são índices 0-based.
  *
- * <p>Esta classe não pode ser instanciada — todos os métodos são estáticos.</p>
+ * Esta classe não pode ser instanciada, todos os métodos são estáticos.
  */
 public final class CoordParser {
 

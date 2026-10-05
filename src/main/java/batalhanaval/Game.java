@@ -10,57 +10,28 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 
-/**
- * Orquestra o fluxo de uma partida: configuração, loop de turnos e pós-jogo.
- *
- * <p>{@code Game} não conhece detalhes de IA nem de impressão — delega para
- * {@link CpuStrategy} e {@link BoardPrinter} respectivamente.</p>
- */
+/** Controla a partida. A IA fica em CpuStrategy e a impressão em BoardPrinter. */
 public class Game {
 
-    /** Nomes e tamanhos da frota clássica (Regras originais). */
     private static final String[] SHIP_NAMES = {
             "Porta-aviões", "Encouraçado", "Cruzador", "Submarino", "Destroyer"
     };
     private static final int[] SHIP_SIZES = {5, 4, 3, 3, 2};
 
-    // ------------------------------------------------------------------
-    //  Dependências
-    // ------------------------------------------------------------------
     private final Scanner     sc;
     private final Random      rng;
     private final CpuStrategy cpuStrategy;
     private final GameLog     log;
 
-    // ------------------------------------------------------------------
-    //  Estado do jogo
-    // ------------------------------------------------------------------
-
-    /** Tabuleiro que mostra a posição real dos navios do jogador. */
     private final Board playerBoard;
-    /**
-     * Tabuleiro que registra onde o jogador já atirou
-     * (mostrado ao lado do playerBoard durante a partida).
-     */
-    private final Board playerShotsBoard;
-    /** Tabuleiro da CPU — oculto ao jogador. */
+    private final Board playerShotsBoard;  // onde o jogador já atirou
     private final Board cpuBoard;
 
     private final Fleet playerFleet;
     private final Fleet cpuFleet;
 
-    // Estatísticas exibidas ao final da partida
     private int playerShots, playerHits, cpuShots, cpuHits;
 
-    // ------------------------------------------------------------------
-    //  Construtor
-    // ------------------------------------------------------------------
-
-    /**
-     * @param sc          scanner conectado à entrada do usuário
-     * @param rng         gerador de números aleatórios (pode ser fixo para testes)
-     * @param cpuStrategy estratégia de IA a ser usada pela CPU
-     */
     public Game(Scanner sc, Random rng, CpuStrategy cpuStrategy) {
         this.sc          = sc;
         this.rng         = rng;
@@ -75,11 +46,6 @@ public class Game {
         cpuFleet    = new Fleet(cpuBoard,    buildShips());
     }
 
-    // ------------------------------------------------------------------
-    //  Ponto de entrada
-    // ------------------------------------------------------------------
-
-    /** Inicia e controla o ciclo completo de uma partida. */
     public void run() {
         System.out.println("=== BATALHA NAVAL ===");
         setupPlayerFleet();
@@ -88,10 +54,6 @@ public class Game {
         printStats();
         askShowLog();
     }
-
-    // ------------------------------------------------------------------
-    //  Configuração
-    // ------------------------------------------------------------------
 
     private void setupPlayerFleet() {
         System.out.println("\nPosicionamento da frota. Coordenadas: A–J e 1–10 (ex: A1, J10).");
@@ -133,10 +95,6 @@ public class Game {
             }
         }
     }
-
-    // ------------------------------------------------------------------
-    //  Loop principal
-    // ------------------------------------------------------------------
 
     private void playLoop() {
         boolean playerTurn = true;
@@ -221,19 +179,11 @@ public class Game {
         log.add("CPU: " + msg + " em " + CoordParser.format(target[0], target[1]));
     }
 
-    // ------------------------------------------------------------------
-    //  Pós-jogo
-    // ------------------------------------------------------------------
-
     private void askShowLog() {
         System.out.print("\nMostrar log completo? (s/N): ");
         String s = sc.nextLine().trim().toLowerCase(Locale.ROOT);
         if (s.equals("s") || s.equals("sim")) log.printAll();
     }
-
-    // ------------------------------------------------------------------
-    //  Utilitários
-    // ------------------------------------------------------------------
 
     private static String formatResult(ShotResult r, String shipName) {
         return switch (r) {

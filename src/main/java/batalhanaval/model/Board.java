@@ -3,9 +3,9 @@ package batalhanaval.model;
 /**
  * Tabuleiro 10×10 do Batalha Naval.
  *
- * <p>Cada célula pode estar em um de quatro estados: {@code EMPTY},
+ * Cada célula pode estar em um de quatro estados: {@code EMPTY},
  * {@code SHIP}, {@code HIT} ou {@code MISS}. O tabuleiro não conhece
- * nenhuma regra de jogo — apenas armazena e expõe estado.</p>
+ * nenhuma regra de jogo, apenas armazena e expõe estado.
  */
 public class Board {
 

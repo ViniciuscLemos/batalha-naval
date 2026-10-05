@@ -7,8 +7,8 @@ import java.util.List;
 /**
  * Registra e expõe os eventos de uma partida.
  *
- * <p>Os eventos são armazenados em ordem cronológica. Métodos de impressão
- * permitem exibir o log completo ou apenas a cauda.</p>
+ * Os eventos são armazenados em ordem cronológica. Métodos de impressão
+ * permitem exibir o log completo ou apenas a cauda.
  */
 public class GameLog {
 

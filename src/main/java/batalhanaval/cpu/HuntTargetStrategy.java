@@ -9,10 +9,10 @@ import java.util.Random;
 /**
  * Estratégia Hunt-and-Target (Caça e Destruição).
  *
- * <p>Comportamento:</p>
+ * Comportamento:
  * <ol>
  *   <li><b>Hunt (caça):</b> atira aleatoriamente, com preferência por células
- *       cuja soma de índices seja par — isso reduz a média de tiros necessários.</li>
+ *       cuja soma de índices seja par, isso reduz a média de tiros necessários.</li>
  *   <li><b>Target (destruição):</b> ao acertar um navio, enfileira as quatro
  *       células vizinhas para tentar a seguir.</li>
  *   <li>Ao afundar um navio, descarta a fila de alvos (com probabilidade 60%)

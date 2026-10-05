@@ -1,121 +1,56 @@
-# ⚓ Batalha Naval — Refatoração
+# Batalha Naval
 
 ![Testes](https://github.com/ViniciuscLemos/batalha-naval/actions/workflows/testes.yml/badge.svg)
 
-Refatoração de um monolito Java em uma arquitetura orientada a objetos com responsabilidades bem definidas.
+Batalha naval no terminal, jogando contra o computador.
 
-## 🎯 Sobre o projeto
+Esse projeto começou como um `Main.java` de umas 450 linhas, tudo numa classe só. A ideia foi refatorar e separar as responsabilidades em classes (tabuleiro, navio, frota, IA, impressão...), seguindo mais ou menos o SOLID.
 
-Este projeto é a refatoração do `Main.java` monolítico original (~450 linhas, tudo em uma classe) para uma estrutura com **9 classes** separadas por responsabilidade, usando os princípios SOLID como guia.
+## Rodando
 
-## 🗂️ Estrutura de pacotes
+Precisa do JDK 17.
 
-```
-src/main/java/batalhanaval/
-├── Main.java                       # Ponto de entrada
-├── Game.java                       # Orquestrador do fluxo de jogo
-│
-├── model/
-│   ├── Board.java                  # Tabuleiro 10×10 (estado das células)
-│   ├── Ship.java                   # Navio com nome, tamanho e HP
-│   ├── Fleet.java                  # Frota: posicionamento + recebe tiros
-│   └── ShotResult.java             # Enum sem estado: MISS / HIT / SUNK
-│
-├── engine/
-│   ├── CoordParser.java            # Converte "A1" ↔ [row, col]
-│   └── GameLog.java                # Registra e exibe eventos
-│
-├── cpu/
-│   ├── CpuStrategy.java            # Interface da IA
-│   └── HuntTargetStrategy.java     # Implementação Hunt-and-Target
-│
-└── ui/
-    └── BoardPrinter.java           # Renderiza tabuleiros no terminal
-```
-
-## 🔄 Mapa de refatoração
-
-| Trecho no monolito | Classe na refatoração |
-|--------------------|-----------------------|
-| `char[][] ownShips / cpuShips` | `Board` |
-| `int[] ownHp / cpuHp` + arrays de HP | `Ship` + `Fleet` |
-| `String[] log[]` + `printLogTail` | `GameLog` |
-| `printTwoBoards` + `printSingleBoard` | `BoardPrinter` |
-| `parseCoord` + `prettyCoord` | `CoordParser` |
-| `cpuTargets` + lógica de IA | `CpuStrategy` + `HuntTargetStrategy` |
-| Loop do jogo em `main()` | `Game` |
-
-## 🚀 Como executar
-
-### Pré-requisito
-
-JDK 17 ou superior instalado.
-
-### Compilar e rodar (terminal, na raiz do projeto)
-
-**Linux/macOS (bash):**
+Linux/Mac:
 ```bash
 javac -encoding UTF-8 -d out $(find src/main/java -name "*.java")
 java -cp out batalhanaval.Main
 ```
 
-**Windows (PowerShell):**
+Windows (PowerShell):
 ```powershell
 javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src\main\java -Filter *.java).FullName
 java -cp out batalhanaval.Main
 ```
 
-### Rodar os testes
-
-**Linux/macOS:**
+Os testes não usam framework, é só compilar a pasta `src` inteira e rodar:
 ```bash
 javac -encoding UTF-8 -d out $(find src -name "*.java")
 java -cp out batalhanaval.BatalhaNavalTest
 ```
 
-**Windows (PowerShell):**
-```powershell
-javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
-java -cp out batalhanaval.BatalhaNavalTest
+## Como jogar
+
+No começo ele pede uma seed. Se você deixar em branco, a partida é aleatória; se digitar um número, dá pra repetir a mesma partida depois. Depois você escolhe se quer posicionar os navios na mão ou deixar que ele posicione automaticamente.
+
+Na sua vez você atira digitando uma coordenada tipo `B7`. Também dá pra ver o log da partida ou o seu tabuleiro. No fim aparecem quantos tiros cada um deu e a taxa de acerto.
+
+A frota é a clássica: porta-aviões (5), encouraçado (4), cruzador (3), submarino (3) e destroyer (2).
+
+## A IA
+
+O computador usa a estratégia de "caça e destruição":
+- enquanto não acerta nada, atira mais ou menos aleatório, mas preferindo as casas em xadrez, porque todo navio ocupa pelo menos 2 casas
+- quando acerta, ele passa a tentar as casas vizinhas até afundar o navio
+
+## Estrutura
+
+```
+src/main/java/batalhanaval/
+  Main.java, Game.java
+  model/    Board, Ship, Fleet, ShotResult
+  engine/   CoordParser, GameLog
+  cpu/      CpuStrategy, HuntTargetStrategy
+  ui/       BoardPrinter
 ```
 
-Os testes não usam framework externo e cobrem o parser de coordenadas, navios, tabuleiro, frota (posicionamento, tiros, afundamento, tiro repetido) e a IA — simulando 30 partidas completas para garantir que a CPU nunca repete uma célula e sempre termina em até 100 tiros. Rodam automaticamente no GitHub Actions a cada push.
-
-## 🎮 Como jogar
-
-1. Ao iniciar, informe uma **seed** (número inteiro) para partidas reproduzíveis, ou deixe em branco para aleatório.
-2. Escolha posicionar os navios **manualmente** ou de forma **automática**.
-3. Durante o jogo, em cada turno você pode:
-   - `1` — Atirar numa coordenada (ex: `B7`)
-   - `2` — Ver os últimos 10 eventos do log
-   - `3` — Ver seu tabuleiro completo
-4. Vence quem afundar todos os navios do adversário.
-5. No fim, o jogo mostra as estatísticas da partida (tiros e taxa de acerto de cada lado).
-
-### Frota clássica
-
-| Navio | Tamanho |
-|-------|---------|
-| Porta-aviões | 5 |
-| Encouraçado | 4 |
-| Cruzador | 3 |
-| Submarino | 3 |
-| Destroyer | 2 |
-
-## 🧠 Estratégia da CPU
-
-A CPU usa a estratégia **Hunt-and-Target**:
-
-1. **Hunt (caça):** atira aleatoriamente, priorizando células com soma de índices par — isso reduz a média de tiros.
-2. **Target (destruição):** ao acertar, enfileira as quatro células vizinhas para tentar a seguir.
-3. Ao afundar um navio, descarta a fila de alvos (60% de chance) e volta ao modo caça.
-
-## 🧩 Princípios SOLID aplicados
-
-- **S** — Responsabilidade Única: cada classe faz uma coisa só.
-- **O** — Aberto/Fechado: `CpuStrategy` permite novas IAs sem alterar `Game`.
-- **D** — Inversão de Dependência: `Game` depende da interface `CpuStrategy`, não da implementação concreta.
-
-## 📝 Licença
-
-Projeto acadêmico — uso livre para fins de estudo.
+`Game` depende da interface `CpuStrategy`, então dá pra criar outra IA sem mexer no resto do jogo.

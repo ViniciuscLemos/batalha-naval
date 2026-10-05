@@ -6,23 +6,6 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
-/**
- * Ponto de entrada da aplicação Batalha Naval.
- *
- * <p>Lê a seed opcional, cria as dependências e inicia a partida.</p>
- *
- * <h2>Como compilar e executar</h2>
- * <pre>
- *   # A partir da raiz do projeto
- *   javac -d out $(find src/main/java -name "*.java")
- *   java -cp out batalhanaval.Main
- * </pre>
- *
- * <p>Ou com Maven (se o pom.xml estiver configurado):</p>
- * <pre>
- *   mvn compile exec:java -Dexec.mainClass=batalhanaval.Main
- * </pre>
- */
 public class Main {
 
     public static void main(String[] args) {
@@ -43,7 +26,7 @@ public class Main {
         try {
             new Game(sc, rng, new HuntTargetStrategy(rng)).run();
         } catch (NoSuchElementException e) {
-            // Ctrl+D / Ctrl+Z ou fim da entrada redirecionada
+            // Ctrl+D / Ctrl+Z
             System.out.println("\nEntrada encerrada. Até a próxima!");
         } finally {
             sc.close();

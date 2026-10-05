@@ -5,7 +5,7 @@ import batalhanaval.model.Board;
 /**
  * Renderiza tabuleiros do Batalha Naval no terminal.
  *
- * <p>Esta classe possui apenas métodos estáticos — não pode ser instanciada.</p>
+ * Esta classe possui apenas métodos estáticos, não pode ser instanciada.
  */
 public final class BoardPrinter {
 
@@ -45,10 +45,6 @@ public final class BoardPrinter {
             System.out.println(buildRow(r, board, showShips));
         }
     }
-
-    // ------------------------------------------------------------------
-    //  Helpers privados
-    // ------------------------------------------------------------------
 
     private static String buildRow(int row, Board board, boolean showShips) {
         StringBuilder sb = new StringBuilder(String.format("%2d", row + 1));

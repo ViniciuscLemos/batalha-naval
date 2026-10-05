@@ -3,8 +3,8 @@ package batalhanaval.cpu;
 /**
  * Define o contrato de uma estratégia de IA para a CPU.
  *
- * <p>Implementações desta interface são intercambiáveis, permitindo
- * trocar de estratégia sem alterar o restante do código (Open/Closed).</p>
+ * Implementações desta interface são intercambiáveis, permitindo
+ * trocar de estratégia sem alterar o restante do código (Open/Closed).
  */
 public interface CpuStrategy {
 

@@ -3,9 +3,9 @@ package batalhanaval.model;
 /**
  * Representa um navio da frota.
  *
- * <p>Encapsula nome, tamanho e pontos de vida (HP). O HP começa igual ao
+ * Encapsula nome, tamanho e pontos de vida (HP). O HP começa igual ao
  * tamanho e diminui a cada {@link #hit()} chamado. Quando chega a zero,
- * {@link #isSunk()} retorna {@code true}.</p>
+ * {@link #isSunk()} retorna {@code true}.
  */
 public class Ship {
 
