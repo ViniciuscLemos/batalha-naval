@@ -1,5 +1,7 @@
 # ⚓ Batalha Naval — Refatoração
 
+![Testes](https://github.com/ViniciuscLemos/batalha-naval/actions/workflows/testes.yml/badge.svg)
+
 Refatoração de um monolito Java em uma arquitetura orientada a objetos com responsabilidades bem definidas.
 
 ## 🎯 Sobre o projeto
@@ -17,7 +19,7 @@ src/main/java/batalhanaval/
 │   ├── Board.java                  # Tabuleiro 10×10 (estado das células)
 │   ├── Ship.java                   # Navio com nome, tamanho e HP
 │   ├── Fleet.java                  # Frota: posicionamento + recebe tiros
-│   └── ShotResult.java             # Enum: MISS / HIT / SUNK
+│   └── ShotResult.java             # Enum sem estado: MISS / HIT / SUNK
 │
 ├── engine/
 │   ├── CoordParser.java            # Converte "A1" ↔ [row, col]
@@ -51,23 +53,33 @@ JDK 17 ou superior instalado.
 
 ### Compilar e rodar (terminal, na raiz do projeto)
 
+**Linux/macOS (bash):**
 ```bash
-# Compilar todos os .java para a pasta out/
-javac -d out $(find src/main/java -name "*.java")
+javac -encoding UTF-8 -d out $(find src/main/java -name "*.java")
+java -cp out batalhanaval.Main
+```
 
-# Executar
+**Windows (PowerShell):**
+```powershell
+javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src\main\java -Filter *.java).FullName
 java -cp out batalhanaval.Main
 ```
 
 ### Rodar os testes
 
+**Linux/macOS:**
 ```bash
-# Compilar tudo (main + test)
-javac -d out $(find src -name "*.java")
-
-# Executar os testes
+javac -encoding UTF-8 -d out $(find src -name "*.java")
 java -cp out batalhanaval.BatalhaNavalTest
 ```
+
+**Windows (PowerShell):**
+```powershell
+javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
+java -cp out batalhanaval.BatalhaNavalTest
+```
+
+Os testes não usam framework externo e cobrem o parser de coordenadas, navios, tabuleiro, frota (posicionamento, tiros, afundamento, tiro repetido) e a IA — simulando 30 partidas completas para garantir que a CPU nunca repete uma célula e sempre termina em até 100 tiros. Rodam automaticamente no GitHub Actions a cada push.
 
 ## 🎮 Como jogar
 
@@ -78,6 +90,7 @@ java -cp out batalhanaval.BatalhaNavalTest
    - `2` — Ver os últimos 10 eventos do log
    - `3` — Ver seu tabuleiro completo
 4. Vence quem afundar todos os navios do adversário.
+5. No fim, o jogo mostra as estatísticas da partida (tiros e taxa de acerto de cada lado).
 
 ### Frota clássica
 

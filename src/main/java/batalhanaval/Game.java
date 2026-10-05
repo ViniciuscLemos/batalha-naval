@@ -49,6 +49,9 @@ public class Game {
     private final Fleet playerFleet;
     private final Fleet cpuFleet;
 
+    // Estatísticas exibidas ao final da partida
+    private int playerShots, playerHits, cpuShots, cpuHits;
+
     // ------------------------------------------------------------------
     //  Construtor
     // ------------------------------------------------------------------
@@ -82,6 +85,7 @@ public class Game {
         setupPlayerFleet();
         cpuFleet.placeAllRandom(rng);
         playLoop();
+        printStats();
         askShowLog();
     }
 
@@ -90,7 +94,7 @@ public class Game {
     // ------------------------------------------------------------------
 
     private void setupPlayerFleet() {
-        System.out.println("\nPositionamento da frota. Coordenadas: A–J e 1–10 (ex: A1, J10).");
+        System.out.println("\nPosicionamento da frota. Coordenadas: A–J e 1–10 (ex: A1, J10).");
         System.out.print("Deseja posicionar manualmente? (s/N): ");
         String answer = sc.nextLine().trim().toLowerCase(Locale.ROOT);
 
@@ -193,8 +197,10 @@ public class Game {
         ShotResult result = cpuFleet.receiveShot(rc[0], rc[1]);
         playerShotsBoard.set(rc[0], rc[1],
                 result == ShotResult.MISS ? Board.Cell.MISS : Board.Cell.HIT);
+        playerShots++;
+        if (result != ShotResult.MISS) playerHits++;
 
-        String msg = formatResult(result);
+        String msg = formatResult(result, cpuFleet.shipNameAt(rc[0], rc[1]));
         System.out.println(msg + " em " + CoordParser.format(rc[0], rc[1]));
         log.add("Jogador: " + msg + " em " + CoordParser.format(rc[0], rc[1]));
         return true;
@@ -207,8 +213,10 @@ public class Game {
 
         ShotResult result = playerFleet.receiveShot(target[0], target[1]);
         cpuStrategy.registerResult(target[0], target[1], result);
+        cpuShots++;
+        if (result != ShotResult.MISS) cpuHits++;
 
-        String msg = formatResult(result);
+        String msg = formatResult(result, playerFleet.shipNameAt(target[0], target[1]));
         System.out.println("CPU: " + msg + " em " + CoordParser.format(target[0], target[1]));
         log.add("CPU: " + msg + " em " + CoordParser.format(target[0], target[1]));
     }
@@ -227,12 +235,22 @@ public class Game {
     //  Utilitários
     // ------------------------------------------------------------------
 
-    private static String formatResult(ShotResult r) {
+    private static String formatResult(ShotResult r, String shipName) {
         return switch (r) {
             case MISS -> "ÁGUA";
             case HIT  -> "ACERTO";
-            case SUNK -> "AFUNDOU: " + r.sunkShipName;
+            case SUNK -> "AFUNDOU: " + shipName;
         };
+    }
+
+    private void printStats() {
+        System.out.println("\n--- Estatísticas da partida ---");
+        System.out.printf("Você: %d tiros, %d acertos (%s)%n", playerShots, playerHits, percent(playerHits, playerShots));
+        System.out.printf("CPU:  %d tiros, %d acertos (%s)%n", cpuShots, cpuHits, percent(cpuHits, cpuShots));
+    }
+
+    private static String percent(int part, int total) {
+        return total == 0 ? "-" : String.format("%.0f%%", 100.0 * part / total);
     }
 
     private static Ship[] buildShips() {

@@ -25,6 +25,10 @@ public class BatalhaNavalTest {
         testFleetCanPlace();
         testFleetReceiveShot();
         testFleetAllSunk();
+        testFleetSunkShipName();
+        testFleetRejectsRepeatedShot();
+        testFleetRandomPlacementIsValid();
+        testCpuNeverRepeatsAndWins();
 
         System.out.printf("%nResultado: %d passou(aram), %d falhou(aram).%n", passed, failed);
         if (failed > 0) System.exit(1);
@@ -121,6 +125,88 @@ public class BatalhaNavalTest {
         assertFalse("not all sunk yet", f.allSunk());
         f.receiveShot(0, 0);
         assertTrue("all sunk after last shot", f.allSunk());
+    }
+
+    static void testFleetSunkShipName() {
+        Board b = new Board();
+        Ship[] ships = {new Ship("Destroyer", 2), new Ship("Submarino", 1)};
+        Fleet f = new Fleet(b, ships);
+        f.place(0, 0, 0, true);  // Destroyer em (0,0) e (0,1)
+        f.place(1, 5, 5, true);  // Submarino em (5,5)
+
+        assertEquals("first hit = HIT", ShotResult.HIT, f.receiveShot(0, 0));
+        assertEquals("second hit = SUNK", ShotResult.SUNK, f.receiveShot(0, 1));
+        assertEquals("sunk ship name", "Destroyer", f.shipNameAt(0, 1));
+        assertEquals("other ship SUNK", ShotResult.SUNK, f.receiveShot(5, 5));
+        // Antes, o nome ficava guardado na constante SUNK e era sobrescrito
+        assertEquals("first name preserved", "Destroyer", f.shipNameAt(0, 0));
+        assertEquals("second name", "Submarino", f.shipNameAt(5, 5));
+        assertNull("no ship at empty cell", f.shipNameAt(9, 9));
+    }
+
+    static void testFleetRejectsRepeatedShot() {
+        Board b = new Board();
+        Fleet f = new Fleet(b, new Ship[]{new Ship("Destroyer", 2)});
+        f.place(0, 0, 0, true);
+        f.receiveShot(0, 0);
+
+        boolean threw = false;
+        try { f.receiveShot(0, 0); } catch (IllegalStateException e) { threw = true; }
+        assertTrue("repeated shot throws", threw);
+        // Antes, o segundo tiro transformava o acerto em água
+        assertEquals("cell stays HIT", Board.Cell.HIT, b.get(0, 0));
+    }
+
+    static void testFleetRandomPlacementIsValid() {
+        for (long seed = 0; seed < 50; seed++) {
+            Board b = new Board();
+            Fleet f = new Fleet(b, classicShips());
+            f.placeAllRandom(new java.util.Random(seed));
+            int cells = 0;
+            for (int r = 0; r < Board.SIZE; r++)
+                for (int c = 0; c < Board.SIZE; c++)
+                    if (b.get(r, c) == Board.Cell.SHIP) cells++;
+            if (cells != 17) {
+                assertEquals("17 ship cells for seed " + seed, 17, cells);
+                return;
+            }
+        }
+        assertTrue("random placement always has 17 ship cells", true);
+    }
+
+    static void testCpuNeverRepeatsAndWins() {
+        // Simula partidas inteiras: a CPU deve afundar tudo sem repetir células
+        for (long seed = 0; seed < 30; seed++) {
+            java.util.Random rng = new java.util.Random(seed);
+            Fleet f = new Fleet(new Board(), classicShips());
+            f.placeAllRandom(rng);
+            batalhanaval.cpu.HuntTargetStrategy cpu = new batalhanaval.cpu.HuntTargetStrategy(rng);
+
+            boolean[][] seen = new boolean[Board.SIZE][Board.SIZE];
+            int shots = 0;
+            while (!f.allSunk()) {
+                int[] t = cpu.chooseTarget();
+                if (t == null || seen[t[0]][t[1]]) {
+                    assertTrue("CPU repeated or gave up (seed " + seed + ")", false);
+                    return;
+                }
+                seen[t[0]][t[1]] = true;
+                cpu.registerResult(t[0], t[1], f.receiveShot(t[0], t[1]));
+                shots++;
+            }
+            if (shots > 100) {
+                assertTrue("CPU took more than 100 shots (seed " + seed + ")", false);
+                return;
+            }
+        }
+        assertTrue("CPU wins 30 games without repeating", true);
+    }
+
+    private static Ship[] classicShips() {
+        return new Ship[]{
+            new Ship("Porta-aviões", 5), new Ship("Encouraçado", 4),
+            new Ship("Cruzador", 3), new Ship("Submarino", 3), new Ship("Destroyer", 2)
+        };
     }
 
     // ------------------------------------------------------------------

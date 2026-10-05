@@ -2,6 +2,7 @@ package batalhanaval;
 
 import batalhanaval.cpu.HuntTargetStrategy;
 
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -39,7 +40,13 @@ public class Main {
             rng = new Random(seed);
         }
 
-        new Game(sc, rng, new HuntTargetStrategy(rng)).run();
-        sc.close();
+        try {
+            new Game(sc, rng, new HuntTargetStrategy(rng)).run();
+        } catch (NoSuchElementException e) {
+            // Ctrl+D / Ctrl+Z ou fim da entrada redirecionada
+            System.out.println("\nEntrada encerrada. Até a próxima!");
+        } finally {
+            sc.close();
+        }
     }
 }

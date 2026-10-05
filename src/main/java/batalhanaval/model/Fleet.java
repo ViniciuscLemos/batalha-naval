@@ -88,15 +88,24 @@ public class Fleet {
      * Aplica um tiro na célula (row, col).
      *
      * @return {@link ShotResult} indicando água, acerto ou afundamento
+     * @throws IllegalArgumentException se a célula estiver fora do tabuleiro
+     * @throws IllegalStateException    se a célula já tiver sido atingida
+     *                                  (sem esta checagem, um acerto repetido viraria "água")
      */
     public ShotResult receiveShot(int row, int col) {
-        if (board.get(row, col) == Board.Cell.SHIP) {
+        if (!board.inBounds(row, col)) {
+            throw new IllegalArgumentException("Tiro fora do tabuleiro: " + row + "," + col);
+        }
+        Board.Cell cell = board.get(row, col);
+        if (cell == Board.Cell.HIT || cell == Board.Cell.MISS) {
+            throw new IllegalStateException("Célula já atingida: " + row + "," + col);
+        }
+
+        if (cell == Board.Cell.SHIP) {
             board.set(row, col, Board.Cell.HIT);
-            int id = shipIndex[row][col];
-            ships[id].hit();
-            return ships[id].isSunk()
-                    ? ShotResult.sunk(ships[id].getName())
-                    : ShotResult.HIT;
+            Ship ship = ships[shipIndex[row][col]];
+            ship.hit();
+            return ship.isSunk() ? ShotResult.SUNK : ShotResult.HIT;
         }
         board.set(row, col, Board.Cell.MISS);
         return ShotResult.MISS;
@@ -110,6 +119,15 @@ public class Fleet {
     public boolean allSunk() {
         for (Ship s : ships) if (!s.isSunk()) return false;
         return true;
+    }
+
+    /**
+     * Nome do navio que ocupa a célula, ou {@code null} se não houver navio.
+     * Usado para anunciar qual navio foi afundado.
+     */
+    public String shipNameAt(int row, int col) {
+        int id = shipIndex[row][col];
+        return id < 0 ? null : ships[id].getName();
     }
 
     /** Conta quantos navios ainda não foram afundados. */
