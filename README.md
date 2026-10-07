@@ -34,6 +34,27 @@ No começo ele pede uma seed. Se você deixar em branco, a partida é aleatória
 
 Na sua vez você atira digitando uma coordenada tipo `B7`. Também dá pra ver o log da partida ou o seu tabuleiro. No fim aparecem quantos tiros cada um deu e a taxa de acerto.
 
+Uma partida no meio (seed 42):
+
+```
+SEU TABULEIRO               |  TIROS NO INIMIGO
+  A B C D E F G H I J       |    A B C D E F G H I J
+ 1 . . . . . S . . . .      |   1 . . . . . . . . . .
+ 2 . . . o . S . . . .      |   2 . X . . . o . . . .
+ 3 . . S . . S S . . .      |   3 . . . . o . . . . .
+ 4 . . S . . S S . . o      |   4 . . . X o . . . . .
+ 5 . . S . . S S . o .      |   5 . . . . o . . . . .
+ 6 o o S . . . . . . .      |   6 . . . . o . . . . .
+ 7 X X X . . . . . . .      |   7 . . . . o . o . . .
+ 8 o o . o . . . . . o      |   8 . . . . . . . X . .
+ 9 . . . . . . . . . .      |   9 . . o . . . . . . .
+10 S S . . . . . . . .      |  10 o . . . . . . . . .
+Legenda: S=navio  X=acerto  o=água  .=vazio
+Navios restantes — você: 4 | CPU: 5
+```
+
+Dá pra ver a IA trabalhando: depois de acertar o navio na linha 7, ela foi atirando em volta até afundar.
+
 A frota é a clássica: porta-aviões (5), encouraçado (4), cruzador (3), submarino (3) e destroyer (2).
 
 ## A IA
