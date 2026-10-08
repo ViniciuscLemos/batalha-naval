@@ -125,7 +125,7 @@ public class Game {
     private void printStatus() {
         System.out.println();
         BoardPrinter.printSideBySide(playerBoard, playerShotsBoard);
-        System.out.printf("Navios restantes — você: %d | CPU: %d%n",
+        System.out.printf("Navios restantes: você %d | CPU %d%n",
                 playerFleet.shipsAlive(), cpuFleet.shipsAlive());
     }
 
@@ -137,15 +137,19 @@ public class Game {
      */
     private boolean doPlayerTurn() {
         System.out.println("\n--- Seu turno ---");
-        System.out.println("1) Atirar   2) Ver log   3) Ver seu tabuleiro");
+        System.out.println("Digite a coordenada pra atirar (ex B7), ou: 2) Ver log   3) Ver seu tabuleiro");
         System.out.print("> ");
         String opt = sc.nextLine().trim();
 
         if ("2".equals(opt)) { log.printTail(10);                                              return false; }
         if ("3".equals(opt)) { BoardPrinter.printSingle("SEU TABULEIRO", playerBoard, true);   return false; }
 
-        System.out.print("Coordenada para atirar (ex B7): ");
-        int[] rc = CoordParser.parse(sc.nextLine());
+        // dá pra atirar direto digitando a coordenada; o "1" do menu antigo continua funcionando
+        int[] rc = CoordParser.parse(opt);
+        if (rc == null && "1".equals(opt)) {
+            System.out.print("Coordenada para atirar (ex B7): ");
+            rc = CoordParser.parse(sc.nextLine());
+        }
         if (rc == null) { System.out.println("Coordenada inválida."); return false; }
 
         if (playerShotsBoard.get(rc[0], rc[1]) != Board.Cell.EMPTY) {

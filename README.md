@@ -32,7 +32,7 @@ java -cp out batalhanaval.BatalhaNavalTest
 
 No começo ele pede uma seed. Se você deixar em branco, a partida é aleatória; se digitar um número, dá pra repetir a mesma partida depois. Depois você escolhe se quer posicionar os navios na mão ou deixar que ele posicione automaticamente.
 
-Na sua vez você atira digitando uma coordenada tipo `B7`. Também dá pra ver o log da partida ou o seu tabuleiro. No fim aparecem quantos tiros cada um deu e a taxa de acerto.
+Na sua vez é só digitar a coordenada, tipo `B7`, que ele já atira. Também dá pra ver o log da partida ou o seu tabuleiro. No fim aparecem quantos tiros cada um deu e a taxa de acerto.
 
 Uma partida no meio (seed 42):
 
@@ -50,7 +50,7 @@ SEU TABULEIRO               |  TIROS NO INIMIGO
  9 . . . . . . . . . .      |   9 . . o . . . . . . .
 10 S S . . . . . . . .      |  10 o . . . . . . . . .
 Legenda: S=navio  X=acerto  o=água  .=vazio
-Navios restantes — você: 4 | CPU: 5
+Navios restantes: você 4 | CPU 5
 ```
 
 Dá pra ver a IA trabalhando: depois de acertar o navio na linha 7, ela foi atirando em volta até afundar.
