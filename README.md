@@ -1,43 +1,43 @@
-# Batalha Naval
+# Battleship
 
-![Testes](https://github.com/ViniciuscLemos/batalha-naval/actions/workflows/testes.yml/badge.svg)
+![Tests](https://github.com/ViniciuscLemos/battleship-java/actions/workflows/tests.yml/badge.svg)
 
-Batalha naval no terminal, jogando contra o computador.
+Battleship in the terminal, playing against the computer.
 
-Esse projeto começou como um `Main.java` de umas 450 linhas, tudo numa classe só. A ideia foi refatorar e separar as responsabilidades em classes (tabuleiro, navio, frota, IA, impressão...), seguindo mais ou menos o SOLID.
+This project started as a `Main.java` with about 450 lines, everything in a single class. The idea was to refactor it and split the responsibilities into classes (board, ship, fleet, AI, printing...), loosely following SOLID.
 
-## Rodando
+## Running
 
-Precisa do JDK 17.
+You need JDK 17.
 
 Linux/Mac:
 ```bash
 javac -encoding UTF-8 -d out $(find src/main/java -name "*.java")
-java -cp out batalhanaval.Main
+java -cp out battleship.Main
 ```
 
 Windows (PowerShell):
 ```powershell
 javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src\main\java -Filter *.java).FullName
-java -cp out batalhanaval.Main
+java -cp out battleship.Main
 ```
 
-Os testes não usam framework, é só compilar a pasta `src` inteira e rodar:
+The tests don't use a framework, you just compile the whole `src` folder and run them:
 ```bash
 javac -encoding UTF-8 -d out $(find src -name "*.java")
-java -cp out batalhanaval.BatalhaNavalTest
+java -cp out battleship.BattleshipTest
 ```
 
-## Como jogar
+## How to play
 
-No começo ele pede uma seed. Se você deixar em branco, a partida é aleatória; se digitar um número, dá pra repetir a mesma partida depois. Depois você escolhe se quer posicionar os navios na mão ou deixar que ele posicione automaticamente.
+At the start it asks for a seed. If you leave it empty, the match is random; if you type a number, you can replay the same match later. Then you choose if you want to place the ships yourself or let it place them for you.
 
-Na sua vez é só digitar a coordenada, tipo `B7`, que ele já atira. Também dá pra ver o log da partida ou o seu tabuleiro. No fim aparecem quantos tiros cada um deu e a taxa de acerto.
+On your turn just type the coordinate, like `B7`, and it shoots. You can also see the match log or your board. At the end it shows how many shots each side fired and the hit rate.
 
-Uma partida no meio (seed 42):
+A match halfway through (seed 42):
 
 ```
-SEU TABULEIRO               |  TIROS NO INIMIGO
+YOUR BOARD                  |  SHOTS AT THE ENEMY
   A B C D E F G H I J       |    A B C D E F G H I J
  1 . . . . . S . . . .      |   1 . . . . . . . . . .
  2 . . . o . S . . . .      |   2 . X . . . o . . . .
@@ -49,24 +49,24 @@ SEU TABULEIRO               |  TIROS NO INIMIGO
  8 o o . o . . . . . o      |   8 . . . . . . . X . .
  9 . . . . . . . . . .      |   9 . . o . . . . . . .
 10 S S . . . . . . . .      |  10 o . . . . . . . . .
-Legenda: S=navio  X=acerto  o=água  .=vazio
-Navios restantes: você 4 | CPU 5
+Legend: S=ship  X=hit  o=miss  .=empty
+Ships left: you 4 | CPU 5
 ```
 
-Dá pra ver a IA trabalhando: depois de acertar o navio na linha 7, ela foi atirando em volta até afundar.
+You can see the AI at work: after hitting the ship on row 7, it kept shooting around it until it sank.
 
-A frota é a clássica: porta-aviões (5), encouraçado (4), cruzador (3), submarino (3) e destroyer (2).
+The fleet is the classic one: carrier (5), battleship (4), cruiser (3), submarine (3) and destroyer (2).
 
-## A IA
+## The AI
 
-O computador usa a estratégia de "caça e destruição":
-- enquanto não acerta nada, atira mais ou menos aleatório, mas preferindo as casas em xadrez, porque todo navio ocupa pelo menos 2 casas
-- quando acerta, ele passa a tentar as casas vizinhas até afundar o navio
+The computer uses the "hunt and target" strategy:
+- while it hasn't hit anything, it shoots more or less at random, but prefers the checkerboard cells, since every ship takes at least 2 cells
+- once it hits something, it tries the neighboring cells until the ship sinks
 
-## Estrutura
+## Structure
 
 ```
-src/main/java/batalhanaval/
+src/main/java/battleship/
   Main.java, Game.java
   model/    Board, Ship, Fleet, ShotResult
   engine/   CoordParser, GameLog
@@ -74,4 +74,4 @@ src/main/java/batalhanaval/
   ui/       BoardPrinter
 ```
 
-`Game` depende da interface `CpuStrategy`, então dá pra criar outra IA sem mexer no resto do jogo.
+`Game` depends on the `CpuStrategy` interface, so you can write another AI without touching the rest of the game.

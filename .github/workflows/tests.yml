@@ -1,11 +1,11 @@
-name: Testes
+name: Tests
 
 on:
   push:
   pull_request:
 
 jobs:
-  testes:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,7 +13,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Compilar
+      - name: Build
         run: javac -encoding UTF-8 -Xlint:all -Werror -d out $(find src -name "*.java")
-      - name: Testes
-        run: java -cp out batalhanaval.BatalhaNavalTest
+      - name: Tests
+        run: java -cp out battleship.BattleshipTest

@@ -1,28 +1,27 @@
-package batalhanaval.engine;
+package battleship.engine;
 
-import batalhanaval.model.Board;
+import battleship.model.Board;
 
 import java.util.Locale;
 
 /**
- * Converte entre notação do usuário ("A1"–"J10") e índices internos [row, col].
+ * Converts between the user's notation ("A1" to "J10") and internal [row, col] indexes.
  *
- * A convenção adotada é: letras A–J representam <em>colunas</em> (eixo x),
- * números 1–10 representam <em>linhas</em> (eixo y). Internamente, row e col
- * são índices 0-based.
+ * Letters A-J are <em>columns</em> (x axis) and numbers 1-10 are
+ * <em>rows</em> (y axis). Internally, row and col are 0-based.
  *
- * Esta classe não pode ser instanciada, todos os métodos são estáticos.
+ * This class can't be instantiated, all methods are static.
  */
 public final class CoordParser {
 
     private CoordParser() {}
 
     /**
-     * Parseia a coordenada digitada pelo usuário.
+     * Parses the coordinate typed by the user.
      *
-     * @param input string no formato "A1"–"J10" (case-insensitive)
-     * @return {@code int[]{row, col}} com índices 0-based,
-     *         ou {@code null} se a entrada for inválida
+     * @param input string in the "A1" to "J10" format (case insensitive)
+     * @return {@code int[]{row, col}} with 0-based indexes,
+     *         or {@code null} if the input is invalid
      */
     public static int[] parse(String input) {
         if (input == null) return null;
@@ -44,11 +43,11 @@ public final class CoordParser {
     }
 
     /**
-     * Converte índices internos de volta para notação legível pelo usuário.
+     * Converts internal indexes back to the user's notation.
      *
-     * @param row linha 0-based
-     * @param col coluna 0-based
-     * @return string no formato "A1"–"J10"
+     * @param row 0-based row
+     * @param col 0-based column
+     * @return string in the "A1" to "J10" format
      */
     public static String format(int row, int col) {
         return "" + (char) ('A' + col) + (row + 1);

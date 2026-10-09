@@ -1,10 +1,10 @@
-package batalhanaval;
+package battleship;
 
-import batalhanaval.engine.CoordParser;
-import batalhanaval.model.*;
+import battleship.engine.CoordParser;
+import battleship.model.*;
 
-// testes sem framework: compila a pasta src e roda essa classe
-public class BatalhaNavalTest {
+// tests without a framework: compile the src folder and run this class
+public class BattleshipTest {
 
     private static int passed = 0;
     private static int failed = 0;
@@ -24,7 +24,7 @@ public class BatalhaNavalTest {
         testFleetRandomPlacementIsValid();
         testCpuNeverRepeatsAndWins();
 
-        System.out.printf("%nResultado: %d passou(aram), %d falhou(aram).%n", passed, failed);
+        System.out.printf("%nResult: %d passed, %d failed.%n", passed, failed);
         if (failed > 0) System.exit(1);
     }
 
@@ -60,7 +60,7 @@ public class BatalhaNavalTest {
         Ship s = new Ship("Test", 2);
         s.hit(); s.hit();
         assertTrue("sunk after 2 hits", s.isSunk());
-        // HP não deve ir abaixo de 0
+        // HP shouldn't go below 0
         s.hit();
         assertEquals("hp >= 0 after extra hit", 0, s.getHp());
     }
@@ -85,7 +85,7 @@ public class BatalhaNavalTest {
         Board b = new Board();
         Ship[] ships = {new Ship("Destroyer", 2)};
         Fleet f = new Fleet(b, ships);
-        f.place(0, 0, 0, true); // ocupa (0,0) e (0,1)
+        f.place(0, 0, 0, true); // takes (0,0) and (0,1)
 
         ShotResult miss = f.receiveShot(5, 5);
         assertEquals("shot at empty = MISS", ShotResult.MISS, miss);
@@ -107,17 +107,17 @@ public class BatalhaNavalTest {
 
     static void testFleetSunkShipName() {
         Board b = new Board();
-        Ship[] ships = {new Ship("Destroyer", 2), new Ship("Submarino", 1)};
+        Ship[] ships = {new Ship("Destroyer", 2), new Ship("Submarine", 1)};
         Fleet f = new Fleet(b, ships);
-        f.place(0, 0, 0, true);  // Destroyer em (0,0) e (0,1)
-        f.place(1, 5, 5, true);  // Submarino em (5,5)
+        f.place(0, 0, 0, true);  // Destroyer at (0,0) and (0,1)
+        f.place(1, 5, 5, true);  // Submarine at (5,5)
 
         assertEquals("first hit = HIT", ShotResult.HIT, f.receiveShot(0, 0));
         assertEquals("second hit = SUNK", ShotResult.SUNK, f.receiveShot(0, 1));
         assertEquals("sunk ship name", "Destroyer", f.shipNameAt(0, 1));
         assertEquals("other ship SUNK", ShotResult.SUNK, f.receiveShot(5, 5));
         assertEquals("first name preserved", "Destroyer", f.shipNameAt(0, 0));
-        assertEquals("second name", "Submarino", f.shipNameAt(5, 5));
+        assertEquals("second name", "Submarine", f.shipNameAt(5, 5));
         assertNull("no ship at empty cell", f.shipNameAt(9, 9));
     }
 
@@ -151,12 +151,12 @@ public class BatalhaNavalTest {
     }
 
     static void testCpuNeverRepeatsAndWins() {
-        // joga partidas inteiras: a CPU tem que afundar tudo sem repetir casa
+        // plays whole matches: the CPU has to sink everything without repeating a cell
         for (long seed = 0; seed < 30; seed++) {
             java.util.Random rng = new java.util.Random(seed);
             Fleet f = new Fleet(new Board(), classicShips());
             f.placeAllRandom(rng);
-            batalhanaval.cpu.HuntTargetStrategy cpu = new batalhanaval.cpu.HuntTargetStrategy(rng);
+            battleship.cpu.HuntTargetStrategy cpu = new battleship.cpu.HuntTargetStrategy(rng);
 
             boolean[][] seen = new boolean[Board.SIZE][Board.SIZE];
             int shots = 0;
@@ -180,8 +180,8 @@ public class BatalhaNavalTest {
 
     private static Ship[] classicShips() {
         return new Ship[]{
-            new Ship("Porta-aviões", 5), new Ship("Encouraçado", 4),
-            new Ship("Cruzador", 3), new Ship("Submarino", 3), new Ship("Destroyer", 2)
+            new Ship("Carrier", 5), new Ship("Battleship", 4),
+            new Ship("Cruiser", 3), new Ship("Submarine", 3), new Ship("Destroyer", 2)
         };
     }
 
@@ -190,7 +190,7 @@ public class BatalhaNavalTest {
             System.out.printf("  PASS  %s%n", label);
             passed++;
         } else {
-            System.out.printf("  FAIL  %s — esperado <%s> mas foi <%s>%n", label, expected, actual);
+            System.out.printf("  FAIL  %s: expected <%s> but was <%s>%n", label, expected, actual);
             failed++;
         }
     }
@@ -212,7 +212,7 @@ public class BatalhaNavalTest {
             System.out.printf("  PASS  %s%n", label);
             passed++;
         } else {
-            System.out.printf("  FAIL  %s — esperado null mas foi <%s>%n", label, obj);
+            System.out.printf("  FAIL  %s: expected null but was <%s>%n", label, obj);
             failed++;
         }
     }
@@ -225,7 +225,7 @@ public class BatalhaNavalTest {
         } else {
             String e = expected == null ? "null" : "[" + expected[0] + "," + expected[1] + "]";
             String a = actual   == null ? "null" : "[" + actual[0]   + "," + actual[1]   + "]";
-            System.out.printf("  FAIL  %s — esperado %s mas foi %s%n", label, e, a);
+            System.out.printf("  FAIL  %s: expected %s but was %s%n", label, e, a);
             failed++;
         }
     }

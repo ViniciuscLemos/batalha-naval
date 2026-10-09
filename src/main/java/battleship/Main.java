@@ -1,6 +1,6 @@
-package batalhanaval;
+package battleship;
 
-import batalhanaval.cpu.HuntTargetStrategy;
+import battleship.cpu.HuntTargetStrategy;
 
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Seed (vazio para aleatório): ");
+        System.out.print("Seed (empty for random): ");
         String seedStr = sc.nextLine().trim();
         Random rng;
         if (seedStr.isEmpty()) {
@@ -27,7 +27,7 @@ public class Main {
             new Game(sc, rng, new HuntTargetStrategy(rng)).run();
         } catch (NoSuchElementException e) {
             // Ctrl+D / Ctrl+Z
-            System.out.println("\nEntrada encerrada. Até a próxima!");
+            System.out.println("\nInput closed. See you next time!");
         } finally {
             sc.close();
         }

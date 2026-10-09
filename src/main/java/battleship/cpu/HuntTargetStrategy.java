@@ -1,22 +1,22 @@
-package batalhanaval.cpu;
+package battleship.cpu;
 
-import batalhanaval.model.Board;
-import batalhanaval.model.ShotResult;
+import battleship.model.Board;
+import battleship.model.ShotResult;
 
 import java.util.ArrayDeque;
 import java.util.Random;
 
 /**
- * Estratégia Hunt-and-Target (Caça e Destruição).
+ * Hunt-and-Target strategy.
  *
- * Comportamento:
+ * How it plays:
  * <ol>
- *   <li><b>Hunt (caça):</b> atira aleatoriamente, com preferência por células
- *       cuja soma de índices seja par, isso reduz a média de tiros necessários.</li>
- *   <li><b>Target (destruição):</b> ao acertar um navio, enfileira as quatro
- *       células vizinhas para tentar a seguir.</li>
- *   <li>Ao afundar um navio, descarta a fila de alvos (com probabilidade 60%)
- *       e volta ao modo caça, evitando desperdiçar tiros em torno do destroço.</li>
+ *   <li><b>Hunt:</b> shoots at random, preferring cells whose index sum
+ *       is even, which lowers the average number of shots needed.</li>
+ *   <li><b>Target:</b> after hitting a ship, queues the four neighboring
+ *       cells to try next.</li>
+ *   <li>After sinking a ship, drops the target queue (60% of the time)
+ *       and goes back to hunting, so it doesn't waste shots around the wreck.</li>
  * </ol>
  */
 public class HuntTargetStrategy implements CpuStrategy {
@@ -33,7 +33,7 @@ public class HuntTargetStrategy implements CpuStrategy {
 
     @Override
     public int[] chooseTarget() {
-        // Fase Target: esgota alvos pendentes de acertos anteriores
+        // Target phase: use up the pending targets from earlier hits
         while (!targets.isEmpty()) {
             int[] t = targets.removeFirst();
             int r = t[0], c = t[1];
@@ -42,7 +42,7 @@ public class HuntTargetStrategy implements CpuStrategy {
             }
         }
 
-        // Fase Hunt: aleatório com preferência de paridade
+        // Hunt phase: random, preferring the checkerboard cells
         for (int attempt = 0; attempt < 5_000; attempt++) {
             int r = rng.nextInt(Board.SIZE);
             int c = rng.nextInt(Board.SIZE);
@@ -51,12 +51,12 @@ public class HuntTargetStrategy implements CpuStrategy {
             }
         }
 
-        // Fallback: primeira célula não tentada
+        // Fallback: first cell not tried yet
         for (int r = 0; r < Board.SIZE; r++)
             for (int c = 0; c < Board.SIZE; c++)
                 if (!tried[r][c]) return new int[]{r, c};
 
-        return null; // todos os 100 quadrados foram tentados — fim de jogo iminente
+        return null; // all 100 cells were tried, the game is about to end
     }
 
     @Override
@@ -67,7 +67,7 @@ public class HuntTargetStrategy implements CpuStrategy {
             enqueueNeighbors(row, col);
         } else if (result == ShotResult.SUNK) {
             if (rng.nextInt(100) < 60) {
-                targets.clear(); // descarta destroço, volta a caçar
+                targets.clear(); // drop the wreck, go back to hunting
             } else {
                 enqueueNeighbors(row, col);
             }

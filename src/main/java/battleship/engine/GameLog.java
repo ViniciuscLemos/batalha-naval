@@ -1,45 +1,45 @@
-package batalhanaval.engine;
+package battleship.engine;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Registra e expõe os eventos de uma partida.
+ * Records the events of a match.
  *
- * Os eventos são armazenados em ordem cronológica. Métodos de impressão
- * permitem exibir o log completo ou apenas a cauda.
+ * Events are kept in chronological order. The print methods show
+ * the full log or just the tail.
  */
 public class GameLog {
 
     private final List<String> entries = new ArrayList<>();
 
-    /** Adiciona um novo evento ao log. */
+    /** Adds a new event to the log. */
     public void add(String event) {
         entries.add(event);
     }
 
-    /** Retorna uma visão imutável de todos os eventos. */
+    /** Returns a read-only view of all events. */
     public List<String> getEntries() {
         return Collections.unmodifiableList(entries);
     }
 
     /**
-     * Imprime os últimos {@code n} eventos no stdout.
+     * Prints the last {@code n} events to stdout.
      *
-     * @param n número de eventos a exibir (se o log tiver menos, exibe todos)
+     * @param n number of events to show (if the log has fewer, shows them all)
      */
     public void printTail(int n) {
-        System.out.println("--- Últimos eventos ---");
+        System.out.println("--- Latest events ---");
         int start = Math.max(0, entries.size() - n);
         for (int i = start; i < entries.size(); i++) {
             System.out.printf("%3d) %s%n", i + 1, entries.get(i));
         }
     }
 
-    /** Imprime todos os eventos no stdout. */
+    /** Prints all events to stdout. */
     public void printAll() {
-        System.out.println("--- Log completo ---");
+        System.out.println("--- Full log ---");
         for (int i = 0; i < entries.size(); i++) {
             System.out.printf("%3d) %s%n", i + 1, entries.get(i));
         }

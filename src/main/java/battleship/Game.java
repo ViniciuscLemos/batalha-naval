@@ -1,20 +1,20 @@
-package batalhanaval;
+package battleship;
 
-import batalhanaval.cpu.CpuStrategy;
-import batalhanaval.engine.CoordParser;
-import batalhanaval.engine.GameLog;
-import batalhanaval.model.*;
-import batalhanaval.ui.BoardPrinter;
+import battleship.cpu.CpuStrategy;
+import battleship.engine.CoordParser;
+import battleship.engine.GameLog;
+import battleship.model.*;
+import battleship.ui.BoardPrinter;
 
 import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 
-/** Controla a partida. A IA fica em CpuStrategy e a impressão em BoardPrinter. */
+/** Runs the match. The AI lives in CpuStrategy and the printing in BoardPrinter. */
 public class Game {
 
     private static final String[] SHIP_NAMES = {
-            "Porta-aviões", "Encouraçado", "Cruzador", "Submarino", "Destroyer"
+            "Carrier", "Battleship", "Cruiser", "Submarine", "Destroyer"
     };
     private static final int[] SHIP_SIZES = {5, 4, 3, 3, 2};
 
@@ -24,7 +24,7 @@ public class Game {
     private final GameLog     log;
 
     private final Board playerBoard;
-    private final Board playerShotsBoard;  // onde o jogador já atirou
+    private final Board playerShotsBoard;  // where the player already shot
     private final Board cpuBoard;
 
     private final Fleet playerFleet;
@@ -47,7 +47,7 @@ public class Game {
     }
 
     public void run() {
-        System.out.println("=== BATALHA NAVAL ===");
+        System.out.println("=== BATTLESHIP ===");
         setupPlayerFleet();
         cpuFleet.placeAllRandom(rng);
         playLoop();
@@ -56,15 +56,15 @@ public class Game {
     }
 
     private void setupPlayerFleet() {
-        System.out.println("\nPosicionamento da frota. Coordenadas: A–J e 1–10 (ex: A1, J10).");
-        System.out.print("Deseja posicionar manualmente? (s/N): ");
+        System.out.println("\nFleet placement. Coordinates: A-J and 1-10 (e.g. A1, J10).");
+        System.out.print("Place the ships yourself? (y/N): ");
         String answer = sc.nextLine().trim().toLowerCase(Locale.ROOT);
 
-        if (answer.equals("s") || answer.equals("sim")) {
+        if (answer.equals("y") || answer.equals("yes")) {
             placeManually();
         } else {
             playerFleet.placeAllRandom(rng);
-            System.out.println("Frota posicionada automaticamente.");
+            System.out.println("Fleet placed automatically.");
         }
     }
 
@@ -73,24 +73,24 @@ public class Game {
             boolean placed = false;
             while (!placed) {
                 System.out.println();
-                BoardPrinter.printSingle("SEU TABULEIRO", playerBoard, true);
-                System.out.printf("Posicionando: %s (tamanho %d)%n", SHIP_NAMES[id], SHIP_SIZES[id]);
+                BoardPrinter.printSingle("YOUR BOARD", playerBoard, true);
+                System.out.printf("Placing: %s (size %d)%n", SHIP_NAMES[id], SHIP_SIZES[id]);
 
-                System.out.print("Coordenada inicial (ex A1): ");
+                System.out.print("Starting coordinate (e.g. A1): ");
                 int[] rc = CoordParser.parse(sc.nextLine());
-                if (rc == null) { System.out.println("Coordenada inválida."); continue; }
+                if (rc == null) { System.out.println("Invalid coordinate."); continue; }
 
-                System.out.print("Direção (H=horizontal / V=vertical): ");
+                System.out.print("Direction (H=horizontal / V=vertical): ");
                 String dir = sc.nextLine().trim().toUpperCase(Locale.ROOT);
-                if (!dir.equals("H") && !dir.equals("V")) { System.out.println("Direção inválida."); continue; }
+                if (!dir.equals("H") && !dir.equals("V")) { System.out.println("Invalid direction."); continue; }
 
                 boolean horiz = dir.equals("H");
                 if (!playerFleet.canPlace(rc[0], rc[1], SHIP_SIZES[id], horiz)) {
-                    System.out.println("Não cabe ou colide. Tente novamente.");
+                    System.out.println("It doesn't fit or overlaps another ship. Try again.");
                     continue;
                 }
                 playerFleet.place(id, rc[0], rc[1], horiz);
-                log.add("Jogador posicionou " + SHIP_NAMES[id] + " em " + CoordParser.format(rc[0], rc[1]));
+                log.add("Player placed " + SHIP_NAMES[id] + " at " + CoordParser.format(rc[0], rc[1]));
                 placed = true;
             }
         }
@@ -103,18 +103,18 @@ public class Game {
             printStatus();
 
             if (cpuFleet.allSunk()) {
-                System.out.println("\n*** VITÓRIA! Você afundou toda a frota inimiga. ***");
-                log.add("Fim: vitória do jogador");
+                System.out.println("\n*** VICTORY! You sank the whole enemy fleet. ***");
+                log.add("End: player wins");
                 break;
             }
             if (playerFleet.allSunk()) {
-                System.out.println("\n*** DERROTA. Sua frota foi afundada. ***");
-                log.add("Fim: vitória da CPU");
+                System.out.println("\n*** DEFEAT. Your fleet was sunk. ***");
+                log.add("End: CPU wins");
                 break;
             }
 
             if (playerTurn) {
-                playerTurn = !doPlayerTurn(); // turno consumido → troca
+                playerTurn = !doPlayerTurn(); // turn used up, switch
             } else {
                 doCpuTurn();
                 playerTurn = true;
@@ -125,35 +125,35 @@ public class Game {
     private void printStatus() {
         System.out.println();
         BoardPrinter.printSideBySide(playerBoard, playerShotsBoard);
-        System.out.printf("Navios restantes: você %d | CPU %d%n",
+        System.out.printf("Ships left: you %d | CPU %d%n",
                 playerFleet.shipsAlive(), cpuFleet.shipsAlive());
     }
 
     /**
-     * Processa o turno do jogador.
+     * Handles the player's turn.
      *
-     * @return {@code true} se um tiro foi disparado (turno consumido),
-     *         {@code false} se o jogador escolheu outra ação (log, tabuleiro)
+     * @return {@code true} if a shot was fired (turn used up),
+     *         {@code false} if the player picked another action (log, board)
      */
     private boolean doPlayerTurn() {
-        System.out.println("\n--- Seu turno ---");
-        System.out.println("Digite a coordenada pra atirar (ex B7), ou: 2) Ver log   3) Ver seu tabuleiro");
+        System.out.println("\n--- Your turn ---");
+        System.out.println("Type the coordinate to shoot (e.g. B7), or: 2) Show log   3) Show your board");
         System.out.print("> ");
         String opt = sc.nextLine().trim();
 
         if ("2".equals(opt)) { log.printTail(10);                                              return false; }
-        if ("3".equals(opt)) { BoardPrinter.printSingle("SEU TABULEIRO", playerBoard, true);   return false; }
+        if ("3".equals(opt)) { BoardPrinter.printSingle("YOUR BOARD", playerBoard, true);      return false; }
 
-        // dá pra atirar direto digitando a coordenada; o "1" do menu antigo continua funcionando
+        // you can shoot by typing the coordinate right away; the "1" from the old menu still works
         int[] rc = CoordParser.parse(opt);
         if (rc == null && "1".equals(opt)) {
-            System.out.print("Coordenada para atirar (ex B7): ");
+            System.out.print("Coordinate to shoot (e.g. B7): ");
             rc = CoordParser.parse(sc.nextLine());
         }
-        if (rc == null) { System.out.println("Coordenada inválida."); return false; }
+        if (rc == null) { System.out.println("Invalid coordinate."); return false; }
 
         if (playerShotsBoard.get(rc[0], rc[1]) != Board.Cell.EMPTY) {
-            System.out.println("Você já atirou nessa posição."); return false;
+            System.out.println("You already shot there."); return false;
         }
 
         ShotResult result = cpuFleet.receiveShot(rc[0], rc[1]);
@@ -163,13 +163,13 @@ public class Game {
         if (result != ShotResult.MISS) playerHits++;
 
         String msg = formatResult(result, cpuFleet.shipNameAt(rc[0], rc[1]));
-        System.out.println(msg + " em " + CoordParser.format(rc[0], rc[1]));
-        log.add("Jogador: " + msg + " em " + CoordParser.format(rc[0], rc[1]));
+        System.out.println(msg + " at " + CoordParser.format(rc[0], rc[1]));
+        log.add("Player: " + msg + " at " + CoordParser.format(rc[0], rc[1]));
         return true;
     }
 
     private void doCpuTurn() {
-        System.out.println("\n--- Turno da CPU ---");
+        System.out.println("\n--- CPU turn ---");
         int[] target = cpuStrategy.chooseTarget();
         if (target == null) return;
 
@@ -179,28 +179,28 @@ public class Game {
         if (result != ShotResult.MISS) cpuHits++;
 
         String msg = formatResult(result, playerFleet.shipNameAt(target[0], target[1]));
-        System.out.println("CPU: " + msg + " em " + CoordParser.format(target[0], target[1]));
-        log.add("CPU: " + msg + " em " + CoordParser.format(target[0], target[1]));
+        System.out.println("CPU: " + msg + " at " + CoordParser.format(target[0], target[1]));
+        log.add("CPU: " + msg + " at " + CoordParser.format(target[0], target[1]));
     }
 
     private void askShowLog() {
-        System.out.print("\nMostrar log completo? (s/N): ");
+        System.out.print("\nShow the full log? (y/N): ");
         String s = sc.nextLine().trim().toLowerCase(Locale.ROOT);
-        if (s.equals("s") || s.equals("sim")) log.printAll();
+        if (s.equals("y") || s.equals("yes")) log.printAll();
     }
 
     private static String formatResult(ShotResult r, String shipName) {
         return switch (r) {
-            case MISS -> "ÁGUA";
-            case HIT  -> "ACERTO";
-            case SUNK -> "AFUNDOU: " + shipName;
+            case MISS -> "MISS";
+            case HIT  -> "HIT";
+            case SUNK -> "SUNK: " + shipName;
         };
     }
 
     private void printStats() {
-        System.out.println("\n--- Estatísticas da partida ---");
-        System.out.printf("Você: %d tiros, %d acertos (%s)%n", playerShots, playerHits, percent(playerHits, playerShots));
-        System.out.printf("CPU:  %d tiros, %d acertos (%s)%n", cpuShots, cpuHits, percent(cpuHits, cpuShots));
+        System.out.println("\n--- Match stats ---");
+        System.out.printf("You:  %d shots, %d hits (%s)%n", playerShots, playerHits, percent(playerHits, playerShots));
+        System.out.printf("CPU:  %d shots, %d hits (%s)%n", cpuShots, cpuHits, percent(cpuHits, cpuShots));
     }
 
     private static String percent(int part, int total) {

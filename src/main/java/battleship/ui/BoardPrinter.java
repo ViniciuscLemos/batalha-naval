@@ -1,11 +1,11 @@
-package batalhanaval.ui;
+package battleship.ui;
 
-import batalhanaval.model.Board;
+import battleship.model.Board;
 
 /**
- * Renderiza tabuleiros do Batalha Naval no terminal.
+ * Draws Battleship boards in the terminal.
  *
- * Esta classe possui apenas métodos estáticos, não pode ser instanciada.
+ * This class only has static methods and can't be instantiated.
  */
 public final class BoardPrinter {
 
@@ -14,29 +14,29 @@ public final class BoardPrinter {
     private BoardPrinter() {}
 
     /**
-     * Exibe dois tabuleiros lado a lado:
-     * à esquerda o tabuleiro do jogador (com navios), à direita os tiros no inimigo.
+     * Shows two boards side by side:
+     * the player's board (with ships) on the left, the shots at the enemy on the right.
      *
-     * @param ownBoard     tabuleiro com posição dos navios do jogador
-     * @param shotsBoard   tabuleiro que registra os tiros do jogador no inimigo
+     * @param ownBoard     board with the player's ships
+     * @param shotsBoard   board with the player's shots at the enemy
      */
     public static void printSideBySide(Board ownBoard, Board shotsBoard) {
-        System.out.printf("%-26s  |  %s%n", "SEU TABULEIRO", "TIROS NO INIMIGO");
+        System.out.printf("%-26s  |  %s%n", "YOUR BOARD", "SHOTS AT THE ENEMY");
         System.out.printf("%-26s  |  %s%n", HEADER, HEADER);
         for (int r = 0; r < Board.SIZE; r++) {
             String left  = buildRow(r, ownBoard,   true);
             String right = buildRow(r, shotsBoard, false);
             System.out.printf("%-26s  |  %s%n", left, right);
         }
-        System.out.println("Legenda: S=navio  X=acerto  o=água  .=vazio");
+        System.out.println("Legend: S=ship  X=hit  o=miss  .=empty");
     }
 
     /**
-     * Exibe um único tabuleiro com um título.
+     * Shows a single board with a title.
      *
-     * @param title      título exibido acima do tabuleiro
-     * @param board      tabuleiro a renderizar
-     * @param showShips  se {@code true}, exibe 'S' nas células com navio
+     * @param title      title shown above the board
+     * @param board      board to draw
+     * @param showShips  if {@code true}, shows 'S' on cells with a ship
      */
     public static void printSingle(String title, Board board, boolean showShips) {
         System.out.println(title);

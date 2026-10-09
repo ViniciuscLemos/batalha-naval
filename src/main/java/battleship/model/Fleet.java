@@ -1,22 +1,22 @@
-package batalhanaval.model;
+package battleship.model;
 
 import java.util.Random;
 
 /**
- * Gerencia o posicionamento e o estado de uma frota sobre um {@link Board}.
+ * Handles placing and tracking a fleet on a {@link Board}.
  *
- * A {@code Fleet} é responsável por:
+ * {@code Fleet} is responsible for:
  * <ul>
- *   <li>Validar e realizar o posicionamento de navios (manual ou aleatório).</li>
- *   <li>Receber tiros e retornar o resultado via {@link ShotResult}.</li>
- *   <li>Consultar o estado geral da frota (navios vivos, todos afundados).</li>
+ *   <li>Checking and placing ships (by hand or at random).</li>
+ *   <li>Taking shots and returning the result as a {@link ShotResult}.</li>
+ *   <li>Telling the overall fleet state (ships alive, all sunk).</li>
  * </ul>
  */
 public class Fleet {
 
     private final Board   board;
     private final Ship[]  ships;
-    /** Índice do navio que ocupa cada célula, -1 se vazia. */
+    /** Index of the ship on each cell, -1 if empty. */
     private final int[][] shipIndex;
 
     public Fleet(Board board, Ship[] ships) {
@@ -29,12 +29,12 @@ public class Fleet {
     }
 
     /**
-     * Verifica se o navio cabe na posição sem sair da grade ou colidir.
+     * Checks if the ship fits at the position without leaving the grid or overlapping.
      *
-     * @param row        linha inicial (0-based)
-     * @param col        coluna inicial (0-based)
-     * @param size       tamanho do navio
-     * @param horizontal {@code true} → cresce para a direita; {@code false} → para baixo
+     * @param row        starting row (0-based)
+     * @param col        starting column (0-based)
+     * @param size       ship size
+     * @param horizontal {@code true} grows to the right; {@code false} grows down
      */
     public boolean canPlace(int row, int col, int size, boolean horizontal) {
         for (int i = 0; i < size; i++) {
@@ -47,8 +47,8 @@ public class Fleet {
     }
 
     /**
-     * Posiciona o navio de índice {@code shipId} no tabuleiro.
-     * Pré-condição: {@link #canPlace} deve retornar {@code true}.
+     * Places the ship with index {@code shipId} on the board.
+     * Precondition: {@link #canPlace} must return {@code true}.
      */
     public void place(int shipId, int row, int col, boolean horizontal) {
         int size = ships[shipId].getSize();
@@ -60,7 +60,7 @@ public class Fleet {
         }
     }
 
-    /** Posiciona toda a frota em posições aleatórias válidas. */
+    /** Places the whole fleet at random valid positions. */
     public void placeAllRandom(Random rng) {
         for (int id = 0; id < ships.length; id++) {
             boolean placed = false;
@@ -77,20 +77,20 @@ public class Fleet {
     }
 
     /**
-     * Aplica um tiro na célula (row, col).
+     * Fires a shot at cell (row, col).
      *
-     * @return {@link ShotResult} indicando água, acerto ou afundamento
-     * @throws IllegalArgumentException se a célula estiver fora do tabuleiro
-     * @throws IllegalStateException    se a célula já tiver sido atingida
-     *                                  (sem esta checagem, um acerto repetido viraria "água")
+     * @return {@link ShotResult} saying miss, hit or sunk
+     * @throws IllegalArgumentException if the cell is outside the board
+     * @throws IllegalStateException    if the cell was already shot
+     *                                  (without this check, a repeated hit would turn into a "miss")
      */
     public ShotResult receiveShot(int row, int col) {
         if (!board.inBounds(row, col)) {
-            throw new IllegalArgumentException("Tiro fora do tabuleiro: " + row + "," + col);
+            throw new IllegalArgumentException("Shot outside the board: " + row + "," + col);
         }
         Board.Cell cell = board.get(row, col);
         if (cell == Board.Cell.HIT || cell == Board.Cell.MISS) {
-            throw new IllegalStateException("Célula já atingida: " + row + "," + col);
+            throw new IllegalStateException("Cell already shot: " + row + "," + col);
         }
 
         if (cell == Board.Cell.SHIP) {
@@ -103,22 +103,22 @@ public class Fleet {
         return ShotResult.MISS;
     }
 
-    /** Retorna {@code true} se todos os navios da frota foram afundados. */
+    /** Returns {@code true} if every ship in the fleet was sunk. */
     public boolean allSunk() {
         for (Ship s : ships) if (!s.isSunk()) return false;
         return true;
     }
 
     /**
-     * Nome do navio que ocupa a célula, ou {@code null} se não houver navio.
-     * Usado para anunciar qual navio foi afundado.
+     * Name of the ship on the cell, or {@code null} if there's no ship.
+     * Used to announce which ship was sunk.
      */
     public String shipNameAt(int row, int col) {
         int id = shipIndex[row][col];
         return id < 0 ? null : ships[id].getName();
     }
 
-    /** Conta quantos navios ainda não foram afundados. */
+    /** Counts how many ships haven't been sunk yet. */
     public int shipsAlive() {
         int count = 0;
         for (Ship s : ships) if (!s.isSunk()) count++;
