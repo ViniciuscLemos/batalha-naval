@@ -10,6 +10,21 @@ import battleship.model.Board;
 public final class BoardPrinter {
 
     private static final String HEADER = "  A B C D E F G H I J";
+    /** Visible width of a board row ("10" + 10 cells), without the color codes. */
+    private static final int ROW_WIDTH = 22;
+
+    private static final String RESET = "[0m";
+    private static final String DIM   = "[90m";
+    private static final String CYAN  = "[36m";
+    private static final String RED   = "[1;31m";
+    private static final String BLUE  = "[34m";
+
+    /**
+     * Colors only when it's a real terminal, so redirecting the output to a file
+     * doesn't fill it with escape codes. NO_COLOR turns them off and FORCE_COLOR on.
+     */
+    private static final boolean COLORS = System.getenv("NO_COLOR") == null
+            && (System.getenv("FORCE_COLOR") != null || System.console() != null);
 
     private BoardPrinter() {}
 
@@ -24,9 +39,10 @@ public final class BoardPrinter {
         System.out.printf("%-26s  |  %s%n", "YOUR BOARD", "SHOTS AT THE ENEMY");
         System.out.printf("%-26s  |  %s%n", HEADER, HEADER);
         for (int r = 0; r < Board.SIZE; r++) {
-            String left  = buildRow(r, ownBoard,   true);
+            // %-26s would count the color codes as characters, so the padding is done by hand
+            String left  = buildRow(r, ownBoard,   true) + " ".repeat(26 - ROW_WIDTH);
             String right = buildRow(r, shotsBoard, false);
-            System.out.printf("%-26s  |  %s%n", left, right);
+            System.out.println(left + "  |  " + right);
         }
         System.out.println("Legend: S=ship  X=hit  o=miss  .=empty");
     }
@@ -49,9 +65,22 @@ public final class BoardPrinter {
     private static String buildRow(int row, Board board, boolean showShips) {
         StringBuilder sb = new StringBuilder(String.format("%2d", row + 1));
         for (int c = 0; c < Board.SIZE; c++) {
-            sb.append(' ').append(toChar(board.get(row, c), showShips));
+            Board.Cell cell = board.get(row, c);
+            char ch = toChar(cell, showShips);
+            sb.append(' ');
+            if (COLORS) sb.append(color(ch)).append(ch).append(RESET);
+            else sb.append(ch);
         }
         return sb.toString();
+    }
+
+    private static String color(char ch) {
+        return switch (ch) {
+            case 'S' -> CYAN;
+            case 'X' -> RED;
+            case 'o' -> BLUE;
+            default  -> DIM;
+        };
     }
 
     private static char toChar(Board.Cell cell, boolean showShips) {

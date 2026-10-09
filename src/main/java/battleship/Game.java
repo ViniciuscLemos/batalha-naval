@@ -98,26 +98,33 @@ public class Game {
 
     private void playLoop() {
         boolean playerTurn = true;
+        // the boards are shown once per round, before the player's shot. An invalid
+        // coordinate or opening the log doesn't print everything again
+        boolean showBoards = true;
 
         while (true) {
-            printStatus();
-
             if (cpuFleet.allSunk()) {
+                printStatus();
                 System.out.println("\n*** VICTORY! You sank the whole enemy fleet. ***");
                 log.add("End: player wins");
                 break;
             }
             if (playerFleet.allSunk()) {
+                printStatus();
                 System.out.println("\n*** DEFEAT. Your fleet was sunk. ***");
                 log.add("End: CPU wins");
                 break;
             }
 
             if (playerTurn) {
-                playerTurn = !doPlayerTurn(); // turn used up, switch
+                if (showBoards) printStatus();
+                boolean used = doPlayerTurn();
+                playerTurn = !used; // turn used up, switch
+                showBoards = false;
             } else {
                 doCpuTurn();
                 playerTurn = true;
+                showBoards = true;
             }
         }
     }

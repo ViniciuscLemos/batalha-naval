@@ -36,24 +36,11 @@ On your turn just type the coordinate, like `B7`, and it shoots. You can also se
 
 A match halfway through (seed 42):
 
-```
-YOUR BOARD                  |  SHOTS AT THE ENEMY
-  A B C D E F G H I J       |    A B C D E F G H I J
- 1 . . . . . S . . . .      |   1 . . . . . . . . . .
- 2 . . . o . S . . . .      |   2 . X . . . o . . . .
- 3 . . S . . S S . . .      |   3 . . . . o . . . . .
- 4 . . S . . S S . . o      |   4 . . . X o . . . . .
- 5 . . S . . S S . o .      |   5 . . . . o . . . . .
- 6 o o S . . . . . . .      |   6 . . . . o . . . . .
- 7 X X X . . . . . . .      |   7 . . . . o . o . . .
- 8 o o . o . . . . . o      |   8 . . . . . . . X . .
- 9 . . . . . . . . . .      |   9 . . o . . . . . . .
-10 S S . . . . . . . .      |  10 o . . . . . . . . .
-Legend: S=ship  X=hit  o=miss  .=empty
-Ships left: you 4 | CPU 5
-```
+![A match in the terminal, with your board on the left and your shots on the right](docs/screenshot.png)
 
-You can see the AI at work: after hitting the ship on row 7, it kept shooting around it until it sank.
+You can see the AI at work: after hitting the ships on rows 7 and 10, it kept shooting around them until they sank.
+
+The boards are colored when the game runs in a terminal. If you redirect the output to a file it goes without colors, and `NO_COLOR=1` turns them off.
 
 The fleet is the classic one: carrier (5), battleship (4), cruiser (3), submarine (3) and destroyer (2).
 
